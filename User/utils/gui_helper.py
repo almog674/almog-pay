@@ -81,10 +81,10 @@ class Gui_Helper(QWidget):
 
     def make_layout_scrollable(self, layout, vertical=False, horizontal=False, height=False, frameStyle=0):
         scroll = QScrollArea()
-        if vertical:
-            scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        if horizontal:
-            scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        if not vertical:
+            scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        if not horizontal:
+            scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         if height:
             scroll.setFixedHeight(height)
         scroll.setWidgetResizable(True)

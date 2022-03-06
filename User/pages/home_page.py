@@ -32,15 +32,15 @@ class Home_Page(QWidget):
         self.create_layouts()
 
     def create_middle_card(self, section_width):
-        card_height = self.height * 0.5
+        card_height = self.height * 0.6
         self.middle_card, self.middle_card_box = Gui_Helper.make_layout_full(
             login_layout_box, section_width * 0.9, card_height)
 
         card_top, card_top_box = Gui_Helper.make_layout_full(
-            homepage_card_top, section_width * 0.9, card_height * 0.25)
+            homepage_card_top, section_width * 0.9, card_height * 0.2)
         card_top.setAlignment(Qt.AlignCenter)
         card_bottom, card_bottom_box = Gui_Helper.make_layout_full(
-            regular, section_width * 0.9, card_height * 0.75, 1)
+            regular, section_width * 0.9, card_height * 0.8, 1)
 
         self.card_title = QLabel(
             f'Current Balance: {Global_State.user["account_balance"]}')
@@ -67,11 +67,10 @@ class Home_Page(QWidget):
         ##### Create the left side #####
         section_width = self.width - self.option_width
         self.left_section, self.left_section_box = Gui_Helper.make_layout_full(
-            homepage_background, section_width, self.height)
+            homepage_background, section_width, self.height * 1.55)
         self.left_section_scroll = Gui_Helper.make_layout_scrollable(
-            self=self, layout=self.left_section_box, vertical=True, height=200)
-        # self.left_section_scroll(Qt.ScrollBarAlwaysOff)
-        self.left_section_scroll.hide()
+            self=self, layout=self.left_section_box, vertical=True)
+        self.left_section_scroll.setStyleSheet(chat_main_scroll())
         self.left_section_scroll.resize(0, 0)
 
         ## Top Part ##
@@ -81,13 +80,13 @@ class Home_Page(QWidget):
 
         ## Middle Part ##
         self.middle_section, self.middle_section_box = Gui_Helper.make_layout_full(
-            regular, section_width, self.height * 0.55)
+            regular, section_width, self.height * 0.70)
         self.middle_section.setAlignment(Qt.AlignCenter)
         self.create_middle_card(section_width)
 
         ## Bottom Part ##
         self.bottom_section, self.bottom_section_box = Gui_Helper.make_layout_full(
-            background, section_width, self.height * 0.6)
+            background, section_width, self.height * 0.70)
 
         self.left_section.addWidget(self.top_section_box)
         self.left_section.addWidget(self.middle_section_box)
@@ -95,5 +94,5 @@ class Home_Page(QWidget):
 
         self.top_section.addWidget(self.title)
 
-        self.main_page.addWidget(self.left_section_box)
+        self.main_page.addWidget(self.left_section_scroll)
         self.main_page.addWidget(self.option_menu.main_layout_box)
