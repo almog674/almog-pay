@@ -69,7 +69,7 @@ class Server:
                         pass
                     if message_code == '2':
                         # Get user information
-                        self.get_user_information(client, messege_sender)
+                        self.get_user_information(client, message_sender)
 
                     if message_code == '11':
                         # login
@@ -148,7 +148,8 @@ class Server:
     def get_user_dict(self, user):
         user = {'username': user.username, 'email': user.email,
                 'account_balance': user.account_balance, 'frame': user.frame,
-                'inbox': user.inbox}
+                'inbox': user.inbox, 'all_time_high': user.all_time_high,
+                'all_time_low': user.all_time_low, 'actions': self.db_tools.populate_actions(user.username, 10)}
         return user
 
     def check_authorize(self, client_id):

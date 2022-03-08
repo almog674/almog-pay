@@ -11,6 +11,9 @@ class User(mongoengine.Document):
     account_id = mongoengine.IntField()  # handle later
 
     account_balance = mongoengine.FloatField(default=0)
+    all_time_high = mongoengine.FloatField(default=0)
+    all_time_low = mongoengine.FloatField(default=0)
+
     # Handle history
     inbox = mongoengine.ListField()
     frame = mongoengine.IntField(default=0)

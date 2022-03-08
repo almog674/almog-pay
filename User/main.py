@@ -13,6 +13,9 @@ from utils.gui_thread import Gui_Thread
 from auth.login import Login
 from auth.sign_up import Signup
 from pages.home_page import Home_Page
+from pages.despoit_page import Despoit_page
+
+from components.option_menu import Option_Menu
 
 from basic_client import Client
 
@@ -63,18 +66,30 @@ class Main(QWidget):
             style_function=main_page_box, width=Global_State.WIDTH, height=Global_State.HEIGHT, direction=1)
         self.page_system = QStackedWidget()
 
+        option_menu_one = Option_Menu(
+            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
+        option_menu_two = Option_Menu(
+            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
+        option_menu_three = Option_Menu(
+            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
+        option_menu_four = Option_Menu(
+            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
+
         # Initialize the pages
         sign_up_page = Signup(Global_State.WIDTH,
                               Global_State.HEIGHT, self.page_system, self.user.send_message_to_server)
         login_page = Login(Global_State.WIDTH,
                            Global_State.HEIGHT, self.page_system, self.user.send_message_to_server)
         self.home_page = Home_Page(Global_State.WIDTH,
-                                   Global_State.HEIGHT)
+                                   Global_State.HEIGHT, option_menu_one)
+        self.despoit_page = Despoit_page(Global_State.WIDTH,
+                                         Global_State.HEIGHT, self.user.send_message_to_server, option_menu_two, type='despoit')
 
         # Add the pages to the page system
         self.page_system.addWidget(sign_up_page.main_page_box)
         self.page_system.addWidget(login_page.main_page_box)
         self.page_system.addWidget(self.home_page.main_page_box)
+        self.page_system.addWidget(self.despoit_page.main_page_box)
 
         self.main_page.addWidget(self.page_system)
 

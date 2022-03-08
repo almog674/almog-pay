@@ -115,6 +115,13 @@ class db_tools:
             print(f"email: {user.email}")
             print(f"password: {user.password}")
 
+    def populate_actions(self, name, number):
+        # Get the last 10 actions of the user
+        items = User.objects(username=name)[0].actions
+        if len(items) > number:
+            items = items[len(items) - number::]
+        return items
+
     def find_user_by_name(self, username):
         user = User.objects(username=username)
         return user

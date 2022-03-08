@@ -204,12 +204,33 @@ def big_text():
 
 # option menu
 
+
+def option_menu_background():
+    return """
+    QGroupBox {
+        background-color: #eee;
+        }
+        """
+
+
+def option_bar_text():
+    return """
+    QLabel {
+        font-size: 16px;
+        background-color: transparent;
+        font-family: arial;
+        color: black;
+    }"""
+
 # option menu
 
 
 # scroll bar
 def chat_main_scroll():
     return """
+    QScrollBar {
+        background-color: black;
+    }
  QScrollBar:vertical
  {
      background-color: #2A2929;

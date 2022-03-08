@@ -55,7 +55,7 @@ class Gui_Helper(QWidget):
         pixmap = QPixmap(url)
         pixmap = pixmap.scaled(width, height, Qt.KeepAspectRatio)
         icon_container.setPixmap(pixmap)
-        mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskOutColor)
+        mask = pixmap.createMaskFromColor(QColor(color), Qt.MaskOutColor)
         pixmap.fill(QColor(color))
         pixmap.setMask(mask)
         return icon_container
