@@ -34,8 +34,6 @@ class Home_Page(QWidget):
         self.max_payment_label.setText(
             f'Max Payment: 1,500$')
 
-        # self.update_events()
-
     def UI(self):
         self.main_page, self.main_page_box = Gui_Helper.make_layout_full(
             homepage_title, self.width, self.height, direction=1)
