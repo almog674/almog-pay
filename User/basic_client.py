@@ -22,7 +22,7 @@ class Client:
 
     def recieve(self, client):
         while True:
-            message = client.recv(1024).decode()
+            message = client.recv(2048).decode()
             if len(self.new_messages) > 50:
                 raise Exception('The data bucket is full')
             self.new_messages.append(message)

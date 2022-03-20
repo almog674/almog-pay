@@ -2,22 +2,22 @@ from PyQt5.QtWidgets import QPushButton, QWidget, QHBoxLayout, QGroupBox, QLabel
 from PyQt5.QtCore import Qt, QMargins
 from PyQt5.QtGui import QIcon, QPixmap, QColor
 
+
 class Message_button(QWidget):
     def __init__(self, text, icon, function):
-        super().__init__() 
+        super().__init__()
         self.icon = icon
         self.text = text
         self.function = function
         self.UI()
 
     def making_window(self):
-        self.setFixedSize(80, 35)
+        self.setFixedSize(100, 35)
         self.setStyleSheet('''
             background-color: #9764c7;
         ''')
         self.mouseReleaseEvent = self.function
         self.setCursor(Qt.PointingHandCursor)
-
 
     def making_shadow(self):
         self.shadow = QGraphicsDropShadowEffect()
@@ -29,10 +29,8 @@ class Message_button(QWidget):
     def initializing_container(self):
         self.container = QHBoxLayout()
         self.container.setSpacing(0)
-        self.container.setContentsMargins(QMargins(0,0,0,0))
+        self.container.setContentsMargins(QMargins(0, 0, 0, 0))
 
-
-    
     def making_label(self):
         self.text_label = QLabel(self.text)
         self.text_label.setAlignment(Qt.AlignCenter)
@@ -65,10 +63,9 @@ class Message_button(QWidget):
 
         self.container.addWidget(self.text_label)
         self.container.addWidget(self.icon_label)
-        
+
         self.setLayout(self.container)
         self.show()
-
 
     def make_icon(self, url, width, height):
         icon_container = QLabel()
@@ -80,4 +77,3 @@ class Message_button(QWidget):
         #     icon.fill(QColor(color))
         #     icon.setMask(mask)
         return icon_container
-

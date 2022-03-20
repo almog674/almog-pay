@@ -147,8 +147,7 @@ class Server:
 
     def get_user_dict(self, user):
         user = {'username': user.username, 'email': user.email,
-                'account_balance': user.account_balance, 'frame': user.frame,
-                'inbox': user.inbox, 'all_time_high': user.all_time_high,
+                'account_balance': user.account_balance, 'frame': user.frame, 'all_time_high': user.all_time_high,
                 'all_time_low': user.all_time_low, 'actions': self.db_tools.populate_actions(user.username, 10)}
         return user
 
@@ -188,6 +187,7 @@ class Server:
             username, amount, action_type)
 
         # send message to user says everything okay
+        self.get_user_information(client, username)
         self.send_message_to_client(
             client, f'Your new balance is {new_balance}', type='SUCCESS')
 
@@ -203,10 +203,15 @@ class Server:
             self.send_message_to_client(client, error_message, status)
             return
 
-        new_sender_balance, new_reciever_balance = self.db_tools.transfer_money(
+        new_sender_balance, new_reciever_balance, error = self.db_tools.transfer_money(
             sender, reciever, amount, description)
+        print(f'error: {error}')
+        if error:
+            return self.send_message_to_client(
+                client, error, type='ERROR')
 
         # send messages to confirm
+        self.get_user_information(client, sender)
         self.send_message_to_client(
             client, f'Transfer to {reciever} {amount} dollars', type='SUCCESS')
 
@@ -219,6 +224,12 @@ class Server:
         self.send_message_to_client(client, str(user_to_send), 'USER')
 
     ################################# Information Functions #########################
+
+    ################################# Inbox Functions #########################
+    def get_messages(self):
+        pass
+        ### not implemented yet ###
+    ################################# Inbox Functions #########################
 
 
 my_server = Server()

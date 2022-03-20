@@ -200,6 +200,41 @@ def big_text():
         font-family: arial;
     }"""
 
+
+def paragraph():
+    return """
+    QLabel {
+        font-size: 12px;
+        background-color: transparent;
+        font-family: arial;
+    }"""
+
+
+def amount_style_red():
+    return """
+    QLabel{
+        background-color:transparent;
+        color: #dd0000;
+        font-size: 14px;
+    }"""
+
+
+def amount_style_green():
+    return """
+    QLabel{
+        background-color:transparent;
+        color: #00A300;
+        font-size: 14px;
+    }"""
+
+
+def event_background():
+    return """
+        QWidget {
+            background: #ccc;
+        }
+    """
+
 # homepage
 
 # option menu

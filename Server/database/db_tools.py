@@ -55,16 +55,20 @@ class db_tools:
         user = self.create_action(user, type, amount)
         if type == 'extract':
             amount = -amount
-        new_balance = self.update_balance(user, amount)
+        user = self.update_balance(user, amount)
+        user = self.check_all_time(user, type)
+        user.save()
         for action in user.actions:
             action = Action.objects(id=action)[0]
             print(action.action_type, action.amount, action.time)
-        return new_balance
+        return user.account_balance
 
     def create_action(self, user, type, amount, description=''):
         new_action = Action()
         new_action.action_type = type
         new_action.amount = amount
+        if description == '':
+            description = 'There is no description to this action.'
         new_action.description = description
         new_action.save()
         user.actions.append(new_action.id)
@@ -83,29 +87,45 @@ class db_tools:
 
     def update_balance(self, user, amount):
         user.account_balance += amount
-        user.save()
-        return user.account_balance
+        return user
+
+    def check_all_time(self, user, type):
+        if type == 'despoit':
+            # Check all time high
+            if user.account_balance > user.all_time_high:
+                user.all_time_high = user.account_balance
+        else:
+            # Check all time low
+            if user.account_balance < user.all_time_low:
+                user.all_time_low = user.account_balance
+
+        return user
 
     def transfer_money(self, sender, reciever, amount, description):
         sender_user = self.find_user_by_name(sender)[0]
-        reciever_user = self.find_user_by_name(reciever)[0]
+        reciever_user = self.find_user_by_name(reciever)
+        print(f'reciever {reciever_user}')
+        if len(reciever_user) == 0:
+            return None, None, f'the user {reciever} is not exits'
 
-        if not reciever_user:
-            return 'ERROR', f'the user {reciever} is not exits'
+        else:
+            reciever_user = reciever_user[0]
 
         # Handle sender
         sender_user = self.create_action(
             sender_user, f'Transfer to {reciever}', amount, description=description)
-        new_sender_balance = self.update_balance(sender_user, -amount)
+        sender_user = self.update_balance(sender_user, -amount)
+        sender_user.save()
 
         # Handle reciever
         reciever_user = self.create_action(
             reciever_user, f'Recieve from {sender}', amount, description=description)
         message_text = f'You have recieved {amount} from {sender}'
-        reciever_user = self.create_message(reciever, message_text)
-        new_reciever_balance = self.update_balance(reciever_user, amount)
+        reciever_user = self.create_message(reciever_user, message_text)
+        reciever_user = self.update_balance(reciever_user, amount)
+        reciever_user.save()
 
-        return new_sender_balance, new_reciever_balance
+        return sender_user.account_balance, reciever_user.account_balance, None
 
     def print_all_users(self):
         all_users = User.objects()
@@ -120,6 +140,8 @@ class db_tools:
         items = User.objects(username=name)[0].actions
         if len(items) > number:
             items = items[len(items) - number::]
+        items = [self.get_action_info(Action.objects(id=item_id)[0])
+                 for item_id in items]
         return items
 
     def find_user_by_name(self, username):
@@ -129,3 +151,11 @@ class db_tools:
     def find_user_by_email(self, email):
         user = User.objects(email=email)
         return user
+
+    def get_action_info(self, action):
+        action_info = {
+            "date": str(action.date), "time": action.time,
+            'description': action.description, 'action_type': action.action_type,
+            'amount': action.amount
+        }
+        return action_info

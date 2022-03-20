@@ -30,11 +30,14 @@ class Option_Menu(QWidget):
             'Transfer', 'User\\assets\\transfer.svg', lambda x: self.functions[1](5), self.width)
         option_five = Option(
             'Inbox', 'User\\assets\\inbox.svg', lambda x: self.functions[1](6), self.width)
+        option_six = Option(
+            'Logout', 'User\\assets\\logout.svg', lambda x: self.functions[2](), self.width)
         self.main_layout.addWidget(option_one)
         self.main_layout.addWidget(option_two)
         self.main_layout.addWidget(option_three)
         self.main_layout.addWidget(option_four)
         self.main_layout.addWidget(option_five)
+        self.main_layout.addWidget(option_six)
 
     def create_title(self, layout):
         title_layout, title_layout_box = Gui_Helper.make_layout_full(
@@ -45,26 +48,3 @@ class Option_Menu(QWidget):
         title.setStyleSheet(regular_text())
         title_layout.addWidget(title)
         layout.addWidget(title_layout_box)
-
-    def create_option(self, text, icon, function=lambda x: print(1)):
-        option_layout, option_layout_box = Gui_Helper.make_layout_full(
-            regular, self.width, 75, direction=1)
-
-        option_label = QLabel(text)
-        option_label.setStyleSheet(regular_text())
-        option_icon = Gui_Helper.make_icon(
-            self=self, url=icon, width=25, height=25)
-
-        option_layout_box.setCursor(Qt.PointingHandCursor)
-
-        option_layout.addStretch(3)
-        option_layout.addWidget(option_label)
-        option_layout.addStretch(1)
-        option_layout.addWidget(option_icon)
-        option_layout.addStretch(3)
-
-        option_layout_box.mouseReleaseEvent = function
-        option_label.mouseReleaseEvent = function
-        option_icon.mouseReleaseEvent = function
-
-        self.main_layout.addWidget(option_layout_box)

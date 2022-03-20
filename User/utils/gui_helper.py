@@ -34,20 +34,16 @@ class Gui_Helper(QWidget):
         label.setPixmap(pixmap)
         return label, pixmap
 
-    def clear_layout(self, layout):
-        print(f'layout {layout}')
+    def clearLayout(self, layout):
         for i in reversed(range(layout.count())):
-            self.delete_item_from_layout(layout.itemAt(i))
+            item = layout.itemAt(i)
+            if isinstance(item, QWidgetItem):
+                item.widget().close()
+            else:
+                self.clearLayout(item.layout())
 
-    def delete_item_from_layout(self, layout):
-        if layout is not None:
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget is not None:
-                    widget.deleteLater()
-                else:
-                    self.delete_item_from_layout(item.layout())
+            # remove the item from layout
+            layout.removeItem(item)
 
     def make_icon(self, url, width, height, color='Black'):
         icon_container = QLabel()

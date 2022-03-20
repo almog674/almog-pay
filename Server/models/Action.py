@@ -6,7 +6,8 @@ from microservices.date_functions import get_formatted_date
 class Action(Document):
     action_type = StringField(required=True)
     amount = FloatField()  # Handle max/min values
-    description = StringField(max_length=120)
+    description = StringField(
+        max_length=120, default='There is no description to this action.')
 
     # handle later with datetime.now
     date = DateField(default=get_formatted_date()[0])

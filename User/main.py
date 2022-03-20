@@ -5,6 +5,7 @@ import threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 
+
 from utils.Global_state import Global_State
 from utils.gui_helper import Gui_Helper
 from utils.style import main_page_box
@@ -14,6 +15,7 @@ from auth.login import Login
 from auth.sign_up import Signup
 from pages.home_page import Home_Page
 from pages.despoit_page import Despoit_page
+from pages.transfer_page import Transfer_Page
 
 from components.option_menu import Option_Menu
 
@@ -53,6 +55,8 @@ class Main(QWidget):
                     self.message_info[1] = 'message'
                     self.message_info[0] = f'{message_sender}: {message_text}'
                     self.gui_thread.make_message_box_func()
+                    if Global_State.user['username'] != 'guest':
+                        self.home_page.update_page()
                 elif message_type == 'user_info':
                     Global_State.user = message
 
@@ -67,13 +71,7 @@ class Main(QWidget):
         self.page_system = QStackedWidget()
 
         option_menu_one = Option_Menu(
-            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
-        option_menu_two = Option_Menu(
-            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
-        option_menu_three = Option_Menu(
-            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
-        option_menu_four = Option_Menu(
-            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page))
+            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page, self.logout))
 
         # Initialize the pages
         sign_up_page = Signup(Global_State.WIDTH,
@@ -82,14 +80,18 @@ class Main(QWidget):
                            Global_State.HEIGHT, self.page_system, self.user.send_message_to_server)
         self.home_page = Home_Page(Global_State.WIDTH,
                                    Global_State.HEIGHT, option_menu_one)
-        self.despoit_page = Despoit_page(Global_State.WIDTH,
-                                         Global_State.HEIGHT, self.user.send_message_to_server, option_menu_two, type='despoit')
+        self.despoit_page = Despoit_page(
+            300, 250, self.user.send_message_to_server, self.go_to_home_page, type='despoit')
+        self.extract_page = Despoit_page(
+            300, 250, self.user.send_message_to_server, self.go_to_home_page, type='extract')
+        self.transfer_page = Transfer_Page(
+            300, 400, self.user.send_message_to_server, self.go_to_home_page)
 
         # Add the pages to the page system
         self.page_system.addWidget(sign_up_page.main_page_box)
         self.page_system.addWidget(login_page.main_page_box)
         self.page_system.addWidget(self.home_page.main_page_box)
-        self.page_system.addWidget(self.despoit_page.main_page_box)
+        # self.page_system.addWidget(self.despoit_page.main_page_box)
 
         self.main_page.addWidget(self.page_system)
 
@@ -98,11 +100,24 @@ class Main(QWidget):
         self.show()
 
     def go_to_page(self, number):
+        if number == 3:
+            self.despoit_page.show()
+        if number == 4:
+            self.extract_page.show()
+        if number == 5:
+            self.transfer_page.show()
         self.page_system.setCurrentIndex(number)
 
     def go_to_home_page(self):
         self.home_page.update_page()
         self.go_to_page(2)
+
+    def logout(self):
+        self.go_to_page(0)
+        Global_State.user = {'username': 'guest', 'email': "guest@gmail.com",
+                             'account_balance': '123', 'all_time_high': '1',
+                             'all_time_low': '1', 'frame': '1',
+                             'actions': []}
 
 
 def main():

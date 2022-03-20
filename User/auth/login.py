@@ -118,6 +118,7 @@ class Login(Auth):
         self.login_submit_button.setCursor(Qt.PointingHandCursor)
         self.login_submit_button.setStyleSheet(login_submit_button())
         self.login_submit_button.clicked.connect(self.login_to_server)
+        self.login_submit_button.clicked.connect(self.clear_login_fields)
 
         ### Field Widgets ###
         self.user_icon = QToolButton()
