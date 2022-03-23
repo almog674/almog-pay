@@ -11,6 +11,7 @@ class Option_Menu(QWidget):
         self.width = width
         self.height = height
         self.functions = functions
+        self.homepage = None
         self.UI()
 
     def UI(self):
@@ -31,6 +32,8 @@ class Option_Menu(QWidget):
         option_five = Option(
             'Inbox', 'User\\assets\\inbox.svg', lambda x: self.functions[1](6), self.width)
         option_six = Option(
+            'Realod', 'User\\assets\\reload.svg', lambda x: self.functions[3](self.homepage), self.width)
+        option_seven = Option(
             'Logout', 'User\\assets\\logout.svg', lambda x: self.functions[2](), self.width)
         self.main_layout.addWidget(option_one)
         self.main_layout.addWidget(option_two)
@@ -38,6 +41,7 @@ class Option_Menu(QWidget):
         self.main_layout.addWidget(option_four)
         self.main_layout.addWidget(option_five)
         self.main_layout.addWidget(option_six)
+        self.main_layout.addWidget(option_seven)
 
     def create_title(self, layout):
         title_layout, title_layout_box = Gui_Helper.make_layout_full(

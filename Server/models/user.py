@@ -6,8 +6,7 @@ class User(mongoengine.Document):
     username = mongoengine.StringField(
         max_length=20, min_length=5, required=True, unique=True)
     email = mongoengine.EmailField(required=True, unique=True)
-    password = mongoengine.StringField(
-        max_length=32, min_length=8, required=True)
+    password = mongoengine.StringField(required=True)
     account_id = mongoengine.IntField()  # handle later
 
     account_balance = mongoengine.FloatField(default=0)

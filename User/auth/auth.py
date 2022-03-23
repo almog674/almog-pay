@@ -6,6 +6,9 @@ from utils.gui_helper import Gui_Helper
 from utils.style import *
 from utils.Global_state import Global_State
 import random
+import change_path
+
+from hash import Hash_Function
 
 
 class Auth(QWidget):
@@ -13,11 +16,13 @@ class Auth(QWidget):
         super().__init__()
         self.page_system = page_system
         self.send_message_to_server = send_message_to_server
+        self.password_hasher = Hash_Function()
         self.setFixedSize(width, height)
         self.setStyleSheet(background())
         self.create_image()
 
     #################### Dealing With Multiple Pages #####################
+
     def insert_page(self, widget, index=-1):
         self.page_system.insertWidget(index, widget)
 

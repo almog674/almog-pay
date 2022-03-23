@@ -4,11 +4,15 @@ from models.user import User
 from models.Action import Action
 from models.Message import Message
 
+import change_path
+from hash import Hash_Function
+
 
 class db_tools:
     def __init__(self):
         # self.delete_all_users()
         self.print_all_users()
+        self.hash = Hash_Function()
 
     def signup(self, info):
         # Extract the information
@@ -38,7 +42,7 @@ class db_tools:
 
     def login(self, info):
         username = info['username']
-        password = info['password']
+        password = self.hash.hash_password(username, info['password'])
 
         users_with_name = self.find_user_by_name(username)
         if len(users_with_name) == 0:

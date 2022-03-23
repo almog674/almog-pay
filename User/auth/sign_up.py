@@ -24,10 +24,27 @@ class Signup(Auth):
         self.sing_up_layouts()
 
     def signup_to_server(self):
-        credentials = {'username': self.singup_username_line_edit.text(),
-                       'email': self.singup_email_line_edit.text(),
-                       'password': self.singup_password_line_edit.text()}
+        username = self.singup_username_line_edit.text()
+        email = self.singup_email_line_edit.text()
+        password = self.singup_password_line_edit.text()
+        credentials = {'username': username,
+                       'email': email,
+                       'password': self.password_hasher.hash_password(username, password)}
+
+        # Validate the password
+        error, message = self.validate_password(username, password)
+        if error:
+            return Gui_Helper.make_message_box(message, 'critical')
         self.send_message_to_server('12', 'guest', credentials)
+
+    def validate_password(self, username, password):
+        if len(password) > 32:
+            return True, "password is too long"
+        if len(password) < 8:
+            return True, "Please provide a password with at least 8 characters"
+        if username == password:
+            return True, "The username and the password cannot be identical"
+        return False, None
 
     def make_singup_mini_profile(self):
         profile = QLabel('Profile')
@@ -122,7 +139,8 @@ class Signup(Auth):
         self.singup_prepasswprd_icon = QToolButton()
         self.singup_prepasswprd_icon.setStyleSheet(field_icon())
         self.singup_prepasswprd_icon.setDisabled(True)
-        self.singup_prepasswprd_icon.setIcon(QIcon('assets/lock-solid.svg'))
+        self.singup_prepasswprd_icon.setIcon(
+            QIcon('./User/assets/lock-solid.svg'))
 
         ### Left Side Widgets ###
         self.singup_avatar = self.make_singup_avatar()

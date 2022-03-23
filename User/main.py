@@ -5,7 +5,6 @@ import threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 
-
 from utils.Global_state import Global_State
 from utils.gui_helper import Gui_Helper
 from utils.style import main_page_box
@@ -40,8 +39,15 @@ class Main(QWidget):
         while True:
             if len(self.user.new_messages) > 0:
                 message = self.user.new_messages[0]
-                message_sender, message_text, message_type, message_date, message_time = message.split(
-                    "/")
+                if "[SERVER_ENCRYPT]" in message:
+                    plain_message = self.user.decrypt_message(message)
+                    message_sender, message_text, message_type, message_date, message_time = plain_message.split(
+                        "/")
+                else:
+                    message_sender, message_text, message_type, message_date, message_time = message.split(
+                        "/")
+
+                # message_text = self.user.check_dictionary(message_text)
                 if message_type == 'ERROR':
                     self.message_info[1] = 'critical'
                     self.message_info[0] = f'{message_sender}: {message_text}'
@@ -60,6 +66,10 @@ class Main(QWidget):
                 elif message_type == 'user_info':
                     Global_State.user = message
 
+                elif message_type == '[KEYS]':
+                    message_text = eval(message_text)
+                    self.user.get_keys(message_text)
+
                 self.user.new_messages.remove(message)
             else:
                 time.sleep(0.25)
@@ -71,7 +81,7 @@ class Main(QWidget):
         self.page_system = QStackedWidget()
 
         option_menu_one = Option_Menu(
-            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page, self.logout))
+            200, Global_State.HEIGHT, (self.go_to_home_page, self.go_to_page, self.logout, Home_Page.update_events))
 
         # Initialize the pages
         sign_up_page = Signup(Global_State.WIDTH,
@@ -114,6 +124,7 @@ class Main(QWidget):
 
     def logout(self):
         self.go_to_page(0)
+        self.home_page.clear_events()
         Global_State.user = {'username': 'guest', 'email': "guest@gmail.com",
                              'account_balance': '123', 'all_time_high': '1',
                              'all_time_low': '1', 'frame': '1',

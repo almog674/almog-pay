@@ -17,6 +17,7 @@ class Home_Page(QWidget):
         self.width = width
         self.height = height
         self.option_menu = option_menu
+        self.option_menu.homepage = self
         self.option_width = 200
 
         self.UI()
@@ -33,6 +34,8 @@ class Home_Page(QWidget):
             f'Frame: {Global_State.user["frame"]}$')
         self.max_payment_label.setText(
             f'Max Payment: 1,500$')
+
+        print(self.option_width)
 
     def UI(self):
         self.main_page, self.main_page_box = Gui_Helper.make_layout_full(
@@ -128,8 +131,11 @@ class Home_Page(QWidget):
             self.events_bottom.addWidget(event_box.event_layout_box)
 
     def update_events(self, event=None):
-        Gui_Helper.clearLayout(self=Gui_Helper, layout=self.events_bottom)
+        self.clear_events()
         self.fill_events()
+
+    def clear_events(self):
+        Gui_Helper.clearLayout(self=Gui_Helper, layout=self.events_bottom)
 
     def create_Widgets(self):
         # Top part
@@ -139,7 +145,7 @@ class Home_Page(QWidget):
         ##### Create the left side #####
         self.section_width = self.width - self.option_width
         self.left_section, self.left_section_box = Gui_Helper.make_layout_full(
-            homepage_background, self.section_width, self.height * 2.1)
+            homepage_background, self.section_width, self.height * 1.8)
         self.left_section_scroll = Gui_Helper.make_layout_scrollable(
             self=self, layout=self.left_section_box, vertical=True)
         self.left_section_scroll.setStyleSheet(chat_main_scroll())
@@ -158,22 +164,16 @@ class Home_Page(QWidget):
 
         ## Bottom Part ##
         self.bottom_section, self.bottom_section_box = Gui_Helper.make_layout_full(
-            regular, self.section_width, self.height * 1.2)
+            regular, self.section_width, self.height * 1)
         self.bottom_section.setAlignment(Qt.AlignCenter)
 
         self.create_events(self.section_width)
-
-        self.reload_button = Gui_Helper.make_icon(
-            self, 'User\\assets\\reload.svg', 30, 30, 'white')
-        self.reload_button.move(30, 30)
-        self.reload_button.mouseReleaseEvent = self.update_events
 
         self.left_section.addWidget(self.top_section_box)
         self.left_section.addWidget(self.middle_section_box)
         self.left_section.addWidget(self.bottom_section_box)
 
         self.top_section.addWidget(self.title)
-        self.top_section.addWidget(self.reload_button)
 
         self.main_page.addWidget(self.left_section_scroll)
         self.main_page.addWidget(self.option_menu.main_layout_box)

@@ -1,10 +1,16 @@
 from socket import *
 import time
+from time import sleep
 import threading
 import random
 from database.db_setup import initialize_db
 from database.db_tools import db_tools
 from microservices.date_functions import get_formatted_date
+import change_path
+
+# Cryptography packeges
+from RSA import RSA
+from Three_DES import Three_des
 
 
 class Server:
@@ -14,6 +20,11 @@ class Server:
         self.server = self.initialize_server(IP, PORT)
         self.db_tools = db_tools()
         self.active_clients = {}
+        self.RSA = RSA()
+        self.DES = Three_des()
+        self.public_key, self.privet_key, self.n = self.RSA.generate_keys()
+        self.key_list = self.DES.generate_keys()
+        print(f"key type: {type(self.key_list[0])}")
 
         while True:
             time.sleep(1)
@@ -38,8 +49,9 @@ class Server:
         client, address = self.server.accept()
 
         # 2) add the client to the client list
+        # 0 = username, 1 = client, 2 = public key, 3 = n
         client_id = self.get_id()
-        self.active_clients[client_id] = [None, client]
+        self.active_clients[client_id] = [None, client, None, None]
 
         # 3) create thread for him & start the communication
         client_thread = threading.Thread(
@@ -59,18 +71,17 @@ class Server:
             try:
                 message = client.recv(1024).decode()
                 if message:
+                    message = self.decrypt_message(message)
                     message_code, message_sender, message_reciever, message_body, message_date, message_time = message.split(
                         '/')
-                    print(message_code, message_sender, message_reciever,
-                          message_body, message_date, message_time)
-
+                    # print(message_code, message_sender, message_reciever,
+                    #       message_body, message_date, message_time)
                     if message_code == '1':
                         # Get new messages
                         pass
                     if message_code == '2':
                         # Get user information
                         self.get_user_information(client, message_sender)
-
                     if message_code == '11':
                         # login
                         self.login(message_body, client, client_id)
@@ -92,6 +103,13 @@ class Server:
                         # Transfer money
                         self.transfer_money(
                             client, client_id, message_sender, message_reciever, message_body)
+                    if message_code == '30':
+                        # Get public RSA keys
+                        self.update_client_key(client_id, message_body)
+                    if message_code == '31':
+                        # Get Three DES keys
+                        self.send_encrypted_keys(client, client_id)
+
             except Exception as e:
                 self.close_client(client, client_id)
                 print(e)
@@ -114,10 +132,13 @@ class Server:
             id = self.get_id()
         return id
 
-    def send_message_to_client(self, client, text='-', type='message', sender='[SERVER]'):
+    def send_message_to_client(self, client, text='-', type='message', sender='[SERVER]', encryption=False):
         date, time = get_formatted_date()
         full_message = f'{sender}/{text}/{type}/{date}/{time}'
-        client.send(full_message.encode())
+        if encryption:
+            self.encrypt_and_send(client, full_message)
+        else:
+            client.send(full_message.encode())
 
     ################################# Auth Functions ###########################
     def ask_for_auth(self, client):
@@ -128,13 +149,14 @@ class Server:
         user, error = self.db_tools.login(info)
         if error:
             print("login failed")
-            self.send_message_to_client(client, error, 'ERROR')
+            self.send_message_to_client(
+                client, error, 'ERROR', encryption=True)
         else:
             print("login seccedd")
             self.active_clients[client_id][0] = user.username
             user = self.get_user_dict(user)
             self.send_message_to_client(
-                client, str(user), type='LOGIN SUCCESS')
+                client, str(user), type='LOGIN SUCCESS', encryption=True)
 
     def sign_up(self, info, client):
         info = eval(info)
@@ -142,7 +164,7 @@ class Server:
         if not user:
             self.send_message_to_client(client, error, 'ERROR')
         else:
-            message = f"Account with name {user.username} creaated successfuly!"
+            message = f"Account with name {user.username} created successfuly!"
             self.send_message_to_client(client, message, type='SIGNUP SUCCESS')
 
     def get_user_dict(self, user):
@@ -225,11 +247,37 @@ class Server:
 
     ################################# Information Functions #########################
 
-    ################################# Inbox Functions #########################
-    def get_messages(self):
-        pass
-        ### not implemented yet ###
-    ################################# Inbox Functions #########################
+    ################################# cryptography Functions #########################
+    def update_client_key(self, client_id, data):
+        data = eval(data)
+        key = data['key']
+        n = data['n']
+        self.active_clients[client_id][2] = key
+        self.active_clients[client_id][3] = n
+
+    def send_encrypted_keys(self, client, client_id):
+        public_key = self.active_clients[client_id][2]
+        n = self.active_clients[client_id][3]
+        encrypted_keys = []
+        for i in range(len(self.key_list)):
+            key = self.RSA.encrypt(public_key, n, self.key_list[i])
+            encrypted_keys.append(key)
+        print(self.key_list)
+        self.send_message_to_client(client, str(encrypted_keys), '[KEYS]')
+
+    def encrypt_and_send(self, client, msg):
+        (iv, cipher_text) = self.DES.encrypt(msg, self.key_list)
+        full_message = f'[SERVER_ENCRYPT] {cipher_text}#{iv}'
+        client.send(full_message.encode())
+
+    def decrypt_message(self, message):
+        encrypted, content = message.split("#", 1)
+        if encrypted == '0':
+            return content
+        cipher_text, IV = content.split("#", 1)
+        plain_text = self.DES.decrypt(cipher_text, self.key_list, IV)
+        return plain_text
+    ################################# cryptography Functions #########################
 
 
 my_server = Server()
